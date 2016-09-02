@@ -13,11 +13,33 @@ android {
         versionName "1.0"
     }
     buildTypes {
+        def apiKey = ""
+
+        // read config file:
+        def Properties props = new Properties()
+        def propFile = file('configs.properties')   //pay attention to the path
+        if (propFile.canRead()){
+            props.load(new FileInputStream(propFile))
+
+            if (props!=null && props.containsKey('moviedb.appkey')) {
+
+                apiKey = props['moviedb.appkey']
+            }
+        }
+
+        debug {
+            buildConfigField "String", "MOVIEDB_APPKEY", apiKey
+        }
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+}
+
+repositories {
+    mavenCentral()
 }
 
 dependencies {
@@ -29,4 +51,7 @@ dependencies {
     compile 'com.android.support:support-v4:23.4.0'
     compile 'com.android.support:recyclerview-v7:23.4.0'
     compile 'com.android.support:design:23.4.0'
+
+    // image loader, maybe better then picasso:
+    compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
 }
