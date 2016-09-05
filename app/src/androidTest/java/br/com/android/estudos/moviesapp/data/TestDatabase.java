@@ -8,7 +8,7 @@ import android.test.AndroidTestCase;
 
 import java.util.HashSet;
 
-import br.com.android.estudos.moviesapp.TestUtils;
+import br.com.android.estudos.moviesapp.util.TestUtils;
 
 /**
  * Created by Dustin on 05/09/2016.
@@ -45,7 +45,7 @@ public class TestDatabase extends AndroidTestCase {
         movieColumnHashSet.add(MoviesContract.MovieEntry.COLUMN_POSTER_PATH);
         movieColumnHashSet.add(MoviesContract.MovieEntry.COLUMN_RELEASE_DATE);
         movieColumnHashSet.add(MoviesContract.MovieEntry.COLUMN_SERVER_ID);
-        movieColumnHashSet.add(MoviesContract.MovieEntry.COLUMN_VOTE_AVARAGE);
+        movieColumnHashSet.add(MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE);
 
         int columnNameIndex = c.getColumnIndex("name");
         do {

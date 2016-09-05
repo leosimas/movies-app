@@ -11,8 +11,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
 
-import java.util.Arrays;
-
 import br.com.android.estudos.moviesapp.data.MoviesContract.MovieEntry;
 
 /**
@@ -157,20 +155,21 @@ public class MoviesProvider extends ContentProvider {
                 break;
             case MOVIE:
                 long id = ContentUris.parseId(uri);
-                final String selectId = MovieEntry._ID+" = ? AND ";
+                final String selectId = MovieEntry._ID + " = ?";
                 final String selectArgId = Long.toString(id);
 
                 if ( selection == null ) {
                     selection = selectId;
                     selectionArgs = new String[]{ selectArgId };
                 } else {
-                    selection = selectId + selection;
+                    selection = selectId + " AND " + selection;
                     if ( selectionArgs != null ) {
                         String[] aux = new String[selectionArgs.length + 1];
                         aux[0] = selectArgId;
                         for (int i = 0; i < selectionArgs.length; i++) {
                             aux[i+1] = selectionArgs[i];
                         }
+                        selectionArgs = aux;
                     } else {
                         selectionArgs = new String[]{ selectArgId };
                     }

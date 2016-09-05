@@ -22,12 +22,12 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         final String SQL_CREATE_MOVIES_TABLE = "CREATE TABLE " + MovieEntry.TABLE_NAME + " ( "+
                 MovieEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                MovieEntry.COLUMN_SERVER_ID + " INTEGER UNIQUE, " +
+                MovieEntry.COLUMN_SERVER_ID + " INTEGER , " +
                 MovieEntry.COLUMN_ORIGINAL_TITLE + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_OVERVIEW + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_POSTER_PATH + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_RELEASE_DATE + " INTEGER, " +
-                MovieEntry.COLUMN_VOTE_AVARAGE + " REAL, " +
+                MovieEntry.COLUMN_VOTE_AVERAGE + " REAL, " +
                 "UNIQUE ( "+ MovieEntry.COLUMN_SERVER_ID + " ) ON CONFLICT REPLACE " +
                 " )";
 

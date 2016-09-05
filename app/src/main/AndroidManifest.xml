@@ -29,6 +29,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="br.com.android.estudos.moviesapp.ui.MainActivity" />
         </activity>
+
+        <provider
+            android:authorities="br.com.android.estudos.moviesapp"
+            android:name=".data.MoviesProvider"
+            android:exported="false"
+            />
+
     </application>
 
 </manifest>
