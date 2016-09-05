@@ -111,7 +111,7 @@ public class MoviesDataRequester {
                 cv.put(MovieEntry.COLUMN_OVERVIEW, movieJson.getString("overview"));
                 cv.put(MovieEntry.COLUMN_VOTE_AVERAGE, movieJson.getDouble("vote_average"));
 
-                contentValues[0] = cv;
+                contentValues[i] = cv;
             }
 
             return contentValues;
