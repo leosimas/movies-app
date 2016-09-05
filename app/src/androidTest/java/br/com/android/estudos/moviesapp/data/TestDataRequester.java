@@ -86,4 +86,12 @@ public class TestDataRequester extends AndroidTestCase {
 
     }
 
+    public void testPosterUrl() {
+        final String posterPath = "/lIv1QinFqz4dlp5U4lQ6HaiskOZ.jpg";
+        final String expectedUrl = "http://image.tmdb.org/t/p/w185" + posterPath;
+
+        final String url = MoviesDataRequester.getPosterUrl( posterPath );
+        assertEquals(expectedUrl, url);
+    }
+
 }

@@ -33,6 +33,9 @@ public class MoviesDataRequester {
 
     private static final SimpleDateFormat SDF_RELEASE_DATE = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 
+    private static final String BASE_URL_API = "http://api.themoviedb.org/3/";
+    private static final String BASE_URL_POSTERS = "http://image.tmdb.org/t/p";
+
     public static @Nullable String getMovies(Context context, String sortValue) {
         // TODO GET movies
         // http://api.themoviedb.org/3/movie/popular
@@ -42,7 +45,7 @@ public class MoviesDataRequester {
         BufferedReader reader;
 
         try {
-            Uri.Builder builder = Uri.parse( "http://api.themoviedb.org/3/" ).buildUpon()
+            Uri.Builder builder = Uri.parse( BASE_URL_API ).buildUpon()
                     .appendPath("movie");
             if ( context.getString(R.string.pref_sort_top_rated).equals( sortValue ) ) {
                 builder.appendPath("top_rated");
@@ -127,7 +130,23 @@ public class MoviesDataRequester {
         return null;
     }
 
-    // TODO GET Movie poster URL:
+    public static String getPosterUrl( String posterPath ) {
+        // url example: http://image.tmdb.org/t/p/w185/lIv1QinFqz4dlp5U4lQ6HaiskOZ.jpg
+        // posterPath = "/lIv1QinFqz4dlp5U4lQ6HaiskOZ.jpg"
+        if ( posterPath == null ) {
+            return null;
+        }
+
+        if (!posterPath.startsWith("/")) {
+            posterPath = "/"+posterPath;
+        }
+
+        return Uri.parse( BASE_URL_POSTERS ).buildUpon()
+                .appendPath( "w185" ) // default image size for mobile
+                .build().toString() +
+                posterPath;
+    }
+
 
 
 
