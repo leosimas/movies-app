@@ -11,6 +11,8 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+import br.com.android.estudos.moviesapp.R;
+
 import static br.com.android.estudos.moviesapp.data.MoviesContract.MovieEntry;
 
 /**
@@ -20,9 +22,13 @@ public class TestDataRequester extends AndroidTestCase {
 
     private static final String LOG_TAG = TestDataRequester.class.getSimpleName();
 
+
+
     public void testRequestAndParser() {
         // request
-        String moviesJson = MoviesDataRequester.getMovies(mContext);
+        String sortMovies = mContext.getString(R.string.pref_sort_popular);
+
+        String moviesJson = MoviesDataRequester.getMovies(mContext, sortMovies);
         assertFalse("json returned : " + moviesJson, moviesJson == null);
 
         // parser
@@ -55,6 +61,28 @@ public class TestDataRequester extends AndroidTestCase {
             Log.e(LOG_TAG, "parsing failed", e);
             fail("parsing data failed, see logcat");
         }
+
+    }
+
+    public void testRequestTopRated() {
+        // request popular
+        String sortMovies = mContext.getString(R.string.pref_sort_popular);
+
+        String moviesJson = MoviesDataRequester.getMovies(mContext, sortMovies);
+        assertFalse("json returned : " + moviesJson, moviesJson == null);
+
+        ContentValues[] contentValuesPopular = MoviesDataRequester.parseMovies(moviesJson);
+
+
+        // top rated:
+        sortMovies = mContext.getString(R.string.pref_sort_top_rated);
+        moviesJson = MoviesDataRequester.getMovies(mContext, sortMovies);
+        assertFalse("json returned : " + moviesJson, moviesJson == null);
+
+        ContentValues[] contentValuesTop = MoviesDataRequester.parseMovies(moviesJson);
+        Integer idTopRated = contentValuesTop[0].getAsInteger(MovieEntry.COLUMN_SERVER_ID);
+        Integer idPopular = contentValuesPopular[0].getAsInteger(MovieEntry.COLUMN_SERVER_ID);
+        assertTrue( idTopRated != idPopular );
 
     }
 

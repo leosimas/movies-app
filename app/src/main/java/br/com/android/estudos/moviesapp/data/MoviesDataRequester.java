@@ -31,15 +31,12 @@ public class MoviesDataRequester {
 
     private static final String LOG_TAG = MoviesDataRequester.class.getSimpleName();
 
-    private static final SimpleDateFormat SDF_RELEASE_DATE = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);;
+    private static final SimpleDateFormat SDF_RELEASE_DATE = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 
-    public static @Nullable String getMovies(Context context) {
+    public static @Nullable String getMovies(Context context, String sortValue) {
         // TODO GET movies
         // http://api.themoviedb.org/3/movie/popular
         // http://api.themoviedb.org/3/movie/top_rated
-
-        String sortMovies = PrefUtils.getSortMovies(context);
-
 
         HttpURLConnection urlConnection;
         BufferedReader reader;
@@ -47,9 +44,9 @@ public class MoviesDataRequester {
         try {
             Uri.Builder builder = Uri.parse( "http://api.themoviedb.org/3/" ).buildUpon()
                     .appendPath("movie");
-            if ( context.getString(R.string.pref_sort_top_rated).equals( sortMovies ) ) {
+            if ( context.getString(R.string.pref_sort_top_rated).equals( sortValue ) ) {
                 builder.appendPath("top_rated");
-            } else { // TOP_RATED
+            } else { // popular
                 builder.appendPath("popular");
             }
             builder.appendQueryParameter("api_key", BuildConfig.MOVIEDB_APPKEY);
@@ -62,7 +59,7 @@ public class MoviesDataRequester {
 
             InputStream inputStream = urlConnection.getInputStream();
             if ( inputStream == null ) {
-                return sortMovies;
+                return sortValue;
             }
 
             reader = new BufferedReader(new InputStreamReader( inputStream ));
@@ -74,9 +71,8 @@ public class MoviesDataRequester {
             }
 
             if ( buffer.length() == 0 ) {
-                return sortMovies;
+                return sortValue;
             }
-
 
             return buffer.toString();
 
