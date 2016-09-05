@@ -2,6 +2,7 @@ package br.com.android.estudos.moviesapp.data;
 
 import android.annotation.TargetApi;
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -9,6 +10,8 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.Nullable;
+
+import java.util.Arrays;
 
 import br.com.android.estudos.moviesapp.data.MoviesContract.MovieEntry;
 
@@ -19,13 +22,16 @@ public class MoviesProvider extends ContentProvider {
 
     private static final UriMatcher URI_MATCHER = buildUriMatcher();
 
-    private static final int MOVIE = 100;
+    private static final int MOVIES = 100;
+    private static final int MOVIE = 101;
 
     private MoviesDbHelper mDbHelper;
 
     private static UriMatcher buildUriMatcher() {
         final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        uriMatcher.addURI(MoviesContract.CONTENT_AUTHORITY, MoviesContract.PATH_MOVIE, MOVIE);
+        final String auth = MoviesContract.CONTENT_AUTHORITY;
+        uriMatcher.addURI(auth, MoviesContract.PATH_MOVIE, MOVIES);
+        uriMatcher.addURI(auth, MoviesContract.PATH_MOVIE + "/#", MOVIE);
         return uriMatcher;
     }
 
@@ -43,6 +49,7 @@ public class MoviesProvider extends ContentProvider {
         Cursor cursor;
 
         switch (match) {
+            case MOVIES:
             case MOVIE:
                 cursor = mDbHelper.getReadableDatabase().query(
                         MovieEntry.TABLE_NAME,
@@ -68,8 +75,10 @@ public class MoviesProvider extends ContentProvider {
         final int match = URI_MATCHER.match(uri);
 
         switch (match) {
-            case MOVIE:
+            case MOVIES:
                 return MovieEntry.CONTENT_TYPE;
+            case MOVIE:
+                return MovieEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri : " + uri);
         }
@@ -85,7 +94,7 @@ public class MoviesProvider extends ContentProvider {
         Uri returnUri;
 
         switch (match) {
-            case MOVIE:
+            case MOVIES:
                 long id = db.insert(MovieEntry.TABLE_NAME, null, values);
                 if ( id > 0) {
                     returnUri = MovieEntry.buildMovieUri(id);
@@ -108,15 +117,19 @@ public class MoviesProvider extends ContentProvider {
         final SQLiteDatabase db = mDbHelper.getWritableDatabase();
         final int match = URI_MATCHER.match(uri);
 
-        if (selection == null ) {
-            selection = "1"; // to delete all
-        }
-
         int deletedRows;
 
         switch (match) {
-            case MOVIE:
+            case MOVIES:
+                if (selection == null ) { // is it really necessary?
+                    selection = "1"; // to delete all
+                }
                 deletedRows = db.delete(MovieEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+
+            case MOVIE:
+                long id = ContentUris.parseId(uri);
+                deletedRows = db.delete(MovieEntry.TABLE_NAME, MovieEntry._ID + " - ?", new String[]{ Long.toString( id ) });
                 break;
 
             default:
@@ -139,7 +152,30 @@ public class MoviesProvider extends ContentProvider {
         int updatedRows;
 
         switch (match) {
+            case MOVIES:
+                updatedRows = db.update(MovieEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
             case MOVIE:
+                long id = ContentUris.parseId(uri);
+                final String selectId = MovieEntry._ID+" = ? AND ";
+                final String selectArgId = Long.toString(id);
+
+                if ( selection == null ) {
+                    selection = selectId;
+                    selectionArgs = new String[]{ selectArgId };
+                } else {
+                    selection = selectId + selection;
+                    if ( selectionArgs != null ) {
+                        String[] aux = new String[selectionArgs.length + 1];
+                        aux[0] = selectArgId;
+                        for (int i = 0; i < selectionArgs.length; i++) {
+                            aux[i+1] = selectionArgs[i];
+                        }
+                    } else {
+                        selectionArgs = new String[]{ selectArgId };
+                    }
+                }
+
                 updatedRows = db.update(MovieEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
 
@@ -160,7 +196,7 @@ public class MoviesProvider extends ContentProvider {
         final int match = URI_MATCHER.match(uri);
 
         switch (match) {
-            case MOVIE:
+            case MOVIES:
                 db.beginTransaction();
 
                 int insertedRows = 0;
