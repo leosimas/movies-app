@@ -239,4 +239,54 @@ public class TestContentProvider extends AndroidTestCase {
         assertTrue(deletedRows == 1);
     }
 
+    private ContentValues[] createNewMovies() {
+
+        ContentValues arrayValues[] = new ContentValues[5];
+
+        for (int i = 0; i < arrayValues.length; i++) {
+            ContentValues values = new ContentValues();
+            final int count = (i+1);
+
+            values.put(MoviesContract.MovieEntry.COLUMN_ORIGINAL_TITLE, "Sharknado " + count);
+            values.put(MoviesContract.MovieEntry.COLUMN_OVERVIEW, "very good! " + count);
+            values.put(MoviesContract.MovieEntry.COLUMN_POSTER_PATH, "/123455_"+count+".jpeg");
+            values.put(MoviesContract.MovieEntry.COLUMN_RELEASE_DATE, 1473033600000l + count); // 2016/09/05
+            values.put(MoviesContract.MovieEntry.COLUMN_SERVER_ID, count + 10);
+            values.put(MoviesContract.MovieEntry.COLUMN_VOTE_AVERAGE, count * 10 / 5f);
+
+            arrayValues[i] = values;
+        }
+
+        return arrayValues;
+    }
+
+    public void testBulkInsert() {
+
+        ContentValues[] newMovies = this.createNewMovies();
+
+        ContentResolver contentResolver = mContext.getContentResolver();
+
+        int insertedRows = contentResolver.bulkInsert(MovieEntry.CONTENT_URI, newMovies);
+        assertEquals("Error bulkinsert returned insertedRows", newMovies.length, insertedRows);
+
+        Cursor c = contentResolver.query(
+                MovieEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        assertEquals("Error query after bulkinsert", newMovies.length, c.getCount());
+        assertTrue(c.moveToFirst());
+
+        for (int i = 0; i < newMovies.length; i++) {
+            TestUtils.validateCurrentRecord("Error validating records", c, newMovies[i]);
+
+            c.moveToNext();
+        }
+
+        c.close();
+
+    }
+
 }

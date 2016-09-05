@@ -95,11 +95,6 @@ public class MoviesDataRequester {
 
         JSONObject jsonObject = new JSONObject( jsonString );
 
-
-
-
-
-
         //
         JSONArray results = jsonObject.getJSONArray("results");
 

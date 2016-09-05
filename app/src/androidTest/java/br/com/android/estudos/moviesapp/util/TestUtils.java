@@ -38,10 +38,20 @@ public class TestUtils extends AndroidTestCase {
             int idx = valueCursor.getColumnIndex(columnName);
             assertFalse("Column '" + columnName + "' not found. " + error, idx == -1);
 
-            String expectedValue = entry.getValue().toString();
-            assertEquals("Value '" + entry.getValue().toString() +
-                    "' did not match the expected value '" +
-                    expectedValue + "'. " + error, expectedValue, valueCursor.getString(idx));
+            int type = valueCursor.getType(idx);
+
+            String expectedValueStr = entry.getValue().toString();
+            switch(type) {
+                case Cursor.FIELD_TYPE_FLOAT:
+                    double givenDouble = valueCursor.getDouble(idx);
+                    assertEquals(Double.valueOf( expectedValueStr ), givenDouble );
+                    break;
+                default:
+                    String givenValue = valueCursor.getString(idx);
+                    assertEquals(expectedValueStr, givenValue );
+
+            }
+
         }
     }
 
