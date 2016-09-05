@@ -127,7 +127,7 @@ public class MoviesProvider extends ContentProvider {
 
             case MOVIE:
                 long id = ContentUris.parseId(uri);
-                deletedRows = db.delete(MovieEntry.TABLE_NAME, MovieEntry._ID + " - ?", new String[]{ Long.toString( id ) });
+                deletedRows = db.delete(MovieEntry.TABLE_NAME, MovieEntry._ID + " = ?", new String[]{ Long.toString( id ) });
                 break;
 
             default:

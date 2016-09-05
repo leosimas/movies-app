@@ -227,6 +227,16 @@ public class TestContentProvider extends AndroidTestCase {
 
     public void testDeleteById() {
         final long movieId = this.insertSharkMovie();
+
+        Uri uri = MovieEntry.buildMovieUri(movieId);
+
+        ContentResolver contentResolver = mContext.getContentResolver();
+        int deletedRows = contentResolver.delete(
+                uri,
+                null,
+                null
+        );
+        assertTrue(deletedRows == 1);
     }
 
 }
