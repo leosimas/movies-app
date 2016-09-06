@@ -9,4 +9,9 @@
     <string name="pref_sort_default">popular</string>
     <string name="pref_sort_popular">popular</string>
     <string name="pref_sort_top_rated">top_rated</string>
+    <string name="title_popular">Pop Movies</string>
+    <string name="title_top_rated">Top Movies</string>
+    <string name="action_sort">Sort</string>
+    <string name="popular">Popular</string>
+    <string name="top_rated">Top rated</string>
 </resources>

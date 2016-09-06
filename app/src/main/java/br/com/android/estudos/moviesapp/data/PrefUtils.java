@@ -11,9 +11,18 @@ import br.com.android.estudos.moviesapp.R;
  */
 public class PrefUtils {
 
-    public static String getSortMovies(Context context) {
+    public static MoviesContract.Sort getSortMovies(Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return preferences.getString( context.getString(R.string.pref_sort_key), context.getString(R.string.pref_sort_default) );
+        String value = preferences.getString(context.getString(R.string.pref_sort_key),
+                context.getString(R.string.pref_sort_default));
+        return MoviesContract.Sort.getByValue( context, value );
     }
 
+    public static void setSortMovies(Context context, MoviesContract.Sort sortMovies) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        preferences.edit().putString(
+                context.getString(R.string.pref_sort_key),
+                context.getString(sortMovies.getPrefValue()))
+                .apply();
+    }
 }

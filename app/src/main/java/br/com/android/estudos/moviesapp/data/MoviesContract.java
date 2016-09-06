@@ -2,8 +2,11 @@ package br.com.android.estudos.moviesapp.data;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.Context;
 import android.net.Uri;
 import android.provider.BaseColumns;
+
+import br.com.android.estudos.moviesapp.R;
 
 /**
  * Created by Dustin on 02/09/2016.
@@ -40,6 +43,35 @@ public class MoviesContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
+    }
+
+    public enum Sort {
+        POPULAR( R.string.pref_sort_popular, R.string.title_popular ),
+        TOP_RATED(R.string.pref_sort_top_rated, R.string.title_top_rated);
+
+        private int prefValue;
+        private int titleRes;
+
+        Sort(int prefValue, int titleRes) {
+            this.prefValue = prefValue;
+            this.titleRes = titleRes;
+        }
+
+        public static Sort getByValue(Context context, String value) {
+            if ( context.getString(TOP_RATED.prefValue).equals( value ) ) {
+                return TOP_RATED;
+            }
+
+            return POPULAR;
+        }
+
+        public int getPrefValue() {
+            return prefValue;
+        }
+
+        public int getTitleRes() {
+            return titleRes;
+        }
     }
 
 }

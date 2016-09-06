@@ -107,7 +107,8 @@ public class MoviesProvider extends ContentProvider {
         }
 
         getContext().getContentResolver().notifyChange(uri, null);
-        db.close();
+
+
         return returnUri;
     }
 
@@ -137,8 +138,6 @@ public class MoviesProvider extends ContentProvider {
         if (deletedRows > 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
-
-        db.close();
 
         return deletedRows;
     }
@@ -191,11 +190,11 @@ public class MoviesProvider extends ContentProvider {
 
     @Override
     public int bulkInsert(@NonNull Uri uri, ContentValues[] values) {
-        final SQLiteDatabase db = mDbHelper.getWritableDatabase();
         final int match = URI_MATCHER.match(uri);
 
         switch (match) {
             case MOVIES:
+                final SQLiteDatabase db = mDbHelper.getWritableDatabase();
                 db.beginTransaction();
 
                 int insertedRows = 0;
@@ -213,6 +212,8 @@ public class MoviesProvider extends ContentProvider {
                 }
 
                 getContext().getContentResolver().notifyChange( uri, null );
+
+//                db.close();
 
                 return insertedRows;
 

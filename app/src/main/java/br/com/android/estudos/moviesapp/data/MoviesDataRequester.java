@@ -36,7 +36,7 @@ public class MoviesDataRequester {
     private static final String BASE_URL_API = "http://api.themoviedb.org/3/";
     private static final String BASE_URL_POSTERS = "http://image.tmdb.org/t/p";
 
-    public static @Nullable String getMovies(Context context, String sortValue) {
+    public static @Nullable String getMovies(Context context, MoviesContract.Sort sort) {
         // TODO GET movies
         // http://api.themoviedb.org/3/movie/popular
         // http://api.themoviedb.org/3/movie/top_rated
@@ -47,7 +47,7 @@ public class MoviesDataRequester {
         try {
             Uri.Builder builder = Uri.parse( BASE_URL_API ).buildUpon()
                     .appendPath("movie");
-            if ( context.getString(R.string.pref_sort_top_rated).equals( sortValue ) ) {
+            if ( sort == MoviesContract.Sort.TOP_RATED ) {
                 builder.appendPath("top_rated");
             } else { // popular
                 builder.appendPath("popular");
@@ -62,7 +62,7 @@ public class MoviesDataRequester {
 
             InputStream inputStream = urlConnection.getInputStream();
             if ( inputStream == null ) {
-                return sortValue;
+                return null;
             }
 
             reader = new BufferedReader(new InputStreamReader( inputStream ));
@@ -74,7 +74,7 @@ public class MoviesDataRequester {
             }
 
             if ( buffer.length() == 0 ) {
-                return sortValue;
+                return null;
             }
 
             return buffer.toString();

@@ -1,18 +1,26 @@
 package br.com.android.estudos.moviesapp.ui;
 
+import android.app.ActionBar;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.PopupMenuCompat;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -28,14 +36,16 @@ import br.com.android.estudos.moviesapp.ui.custom.MovieCursorAdapter;
  */
 public class MoviesFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    private static final String LOG_TAG = MoviesFragment.class.getSimpleName();
+
     private static final int LOADER_ID = 100;
     private static final int GRID_COLUMNS = 3;
 
     private RecyclerView mRecyclerView;
     private MovieCursorAdapter mAdapter;
-    private GridLayoutManager mGridLayoutManager;
 
     public MoviesFragment() {
+        this.setHasOptionsMenu(true);
     }
 
     @Override
@@ -57,8 +67,8 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
         final Context context = getActivity();
 
         mRecyclerView.setHasFixedSize(true);
-        mGridLayoutManager = new GridLayoutManager(context, GRID_COLUMNS);
-        mRecyclerView.setLayoutManager( mGridLayoutManager );
+        GridLayoutManager mGridLayoutManager = new GridLayoutManager(context, GRID_COLUMNS);
+        mRecyclerView.setLayoutManager(mGridLayoutManager);
 
         Cursor cursor = context.getContentResolver().query(
                 MovieEntry.CONTENT_URI,
@@ -77,9 +87,7 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     private void updateMovies() {
-        Context context = this.getActivity();
-        final String sort = PrefUtils.getSortMovies(context);
-        new MoviesTask(context).execute(sort);
+        new MoviesTask(this.getActivity()).execute();
     }
 
     @Override
@@ -94,6 +102,7 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        Log.d(LOG_TAG, "onLoadFinished, data.isClosed() = " + data.isClosed());
         mAdapter.swapCursor(data);
     }
 
@@ -102,35 +111,101 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
         mAdapter.swapCursor(null);
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_frag_movies, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        final int id = item.getItemId();
+
+        switch (id) {
+            case R.id.action_sort:
+//                this.showSortPopupMenu(item.getActionView());
+                View view = getActivity().findViewById(item.getItemId());
+                Log.d(LOG_TAG, "onOptionsItemSelected view = " + view);
+                this.showSortPopupMenu( view );
+                return  true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void showSortPopupMenu(View actionView) {
+        PopupMenu popupMenu = new PopupMenu(this.getActivity(), actionView);
+        popupMenu.inflate(R.menu.menu_sort);
+        popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                MoviesContract.Sort newSort;
+
+                final int id = item.getItemId();
+                switch (id) {
+                    case R.id.action_sort_popular:
+                        newSort = MoviesContract.Sort.POPULAR;
+                        break;
+                    case R.id.action_sort_top_rated:
+                        newSort = MoviesContract.Sort.TOP_RATED;
+                        break;
+                    default:
+                        return false;
+                }
+
+                if ( PrefUtils.getSortMovies(getContext()) == newSort ) {
+                    return true;
+                }
+
+                ((Callback)getActivity()).onSortChanged(newSort);
+
+                PrefUtils.setSortMovies(getActivity(), newSort);
+                updateMovies();
+
+                getLoaderManager().restartLoader(LOADER_ID, null, MoviesFragment.this);
+                return true;
+            }
+        });
+        popupMenu.show();
+    }
+
     private class MoviesTask extends AsyncTask<String, Void, Void> {
 
-        private Context mContext;
+        private final Context mContext;
+        private final MoviesContract.Sort mSort;
 
-        public MoviesTask(Context mContext) {
-            this.mContext = mContext;
+        public MoviesTask(Context context) {
+            this.mContext = context;
+            mSort = PrefUtils.getSortMovies(context);
         }
 
         @Override
         protected Void doInBackground(String... params) {
-            if ( params == null || params.length == 0 ) {
-                return null;
-            }
-
-            final String sort = params[0];
-
-            String moviesJson = MoviesDataRequester.getMovies(mContext, sort);
+            String moviesJson = MoviesDataRequester.getMovies(mContext, mSort);
             if ( moviesJson == null ) {
                 return null;
             }
 
             ContentValues[] contentValues = MoviesDataRequester.parseMovies(moviesJson);
+            if ( contentValues == null ) {
+                return null;
+            }
 
-            // TODO delete all?
+            ContentResolver contentResolver = mContext.getContentResolver();
 
-            mContext.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, contentValues);
+            int deleted = contentResolver.delete(MovieEntry.CONTENT_URI, null, null);
+            Log.d(LOG_TAG, "deleted rows = " + deleted);
+
+            int inserted = contentResolver.bulkInsert(MovieEntry.CONTENT_URI, contentValues);
+            Log.d(LOG_TAG, "inserted rows = " + inserted);
 
             return null;
         }
+    }
+
+    public interface Callback {
+
+        void onSortChanged(MoviesContract.Sort newSort);
+
     }
 
 }
