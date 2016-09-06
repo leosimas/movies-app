@@ -180,7 +180,7 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
 
         @Override
         protected Void doInBackground(String... params) {
-            String moviesJson = MoviesDataRequester.getMovies(mContext, mSort);
+            String moviesJson = MoviesDataRequester.getMovies(mSort);
             if ( moviesJson == null ) {
                 return null;
             }

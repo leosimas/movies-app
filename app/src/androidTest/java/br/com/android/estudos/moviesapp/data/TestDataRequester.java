@@ -9,9 +9,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Locale;
 
 import br.com.android.estudos.moviesapp.R;
+import br.com.android.estudos.moviesapp.data.MoviesContract.Sort;
+import br.com.android.estudos.moviesapp.model.Movie;
+import br.com.android.estudos.moviesapp.model.MovieReview;
+import br.com.android.estudos.moviesapp.model.MovieVideo;
 
 import static br.com.android.estudos.moviesapp.data.MoviesContract.MovieEntry;
 
@@ -26,9 +31,7 @@ public class TestDataRequester extends AndroidTestCase {
 
     public void testRequestAndParser() {
         // request
-        String sortMovies = mContext.getString(R.string.pref_sort_popular);
-
-        String moviesJson = MoviesDataRequester.getMovies(mContext, sortMovies);
+        String moviesJson = MoviesDataRequester.getMovies( Sort.POPULAR );
         assertFalse("json returned : " + moviesJson, moviesJson == null);
 
         // parser
@@ -66,17 +69,14 @@ public class TestDataRequester extends AndroidTestCase {
 
     public void testRequestTopRated() {
         // request popular
-        String sortMovies = mContext.getString(R.string.pref_sort_popular);
-
-        String moviesJson = MoviesDataRequester.getMovies(mContext, sortMovies);
+        String moviesJson = MoviesDataRequester.getMovies(Sort.POPULAR);
         assertFalse("json returned : " + moviesJson, moviesJson == null);
 
         ContentValues[] contentValuesPopular = MoviesDataRequester.parseMovies(moviesJson);
 
 
         // top rated:
-        sortMovies = mContext.getString(R.string.pref_sort_top_rated);
-        moviesJson = MoviesDataRequester.getMovies(mContext, sortMovies);
+        moviesJson = MoviesDataRequester.getMovies(Sort.TOP_RATED);
         assertFalse("json returned : " + moviesJson, moviesJson == null);
 
         ContentValues[] contentValuesTop = MoviesDataRequester.parseMovies(moviesJson);
@@ -92,6 +92,32 @@ public class TestDataRequester extends AndroidTestCase {
 
         final String url = MoviesDataRequester.getPosterUrl( posterPath );
         assertEquals(expectedUrl, url);
+    }
+
+    public void testGetVideos() {
+        final Movie m = new Movie();
+        m.setServerId( 244786 );
+
+        String videosJson = MoviesDataRequester.getVideos( m );
+        assertFalse("json returned : " + videosJson, videosJson == null);
+
+        List<MovieVideo> list = MoviesDataRequester.parseVideos(videosJson);
+        assertTrue(list != null);
+        assertTrue(list.size() > 0);
+
+    }
+
+    public void testGetReviews() {
+        final Movie m = new Movie();
+        m.setServerId( 244786 );
+
+        String videosJson = MoviesDataRequester.getReviews( m );
+        assertFalse("json returned : " + videosJson, videosJson == null);
+
+        List<MovieReview> list = MoviesDataRequester.parseReviews(videosJson);
+        assertTrue(list != null);
+        assertTrue(list.size() > 0);
+
     }
 
 }
