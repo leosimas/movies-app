@@ -56,6 +56,7 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
 
         final Context context = getActivity();
 
+        mRecyclerView.setHasFixedSize(true);
         mGridLayoutManager = new GridLayoutManager(context, GRID_COLUMNS);
         mRecyclerView.setLayoutManager( mGridLayoutManager );
 
@@ -123,6 +124,8 @@ public class MoviesFragment extends Fragment implements LoaderManager.LoaderCall
             }
 
             ContentValues[] contentValues = MoviesDataRequester.parseMovies(moviesJson);
+
+            // TODO delete all?
 
             mContext.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI, contentValues);
 

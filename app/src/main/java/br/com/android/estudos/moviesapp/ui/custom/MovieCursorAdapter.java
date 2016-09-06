@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import br.com.android.estudos.moviesapp.R;
+import br.com.android.estudos.moviesapp.data.MoviesContract;
 import br.com.android.estudos.moviesapp.data.MoviesDataRequester;
 import br.com.android.estudos.moviesapp.model.Movie;
 
@@ -25,9 +26,10 @@ public class MovieCursorAdapter extends CursorRecyclerViewAdapter<MovieCursorAda
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, Cursor cursor) {
-        Movie movie = Movie.fromCursor(cursor);
+//        Movie movie = Movie.fromCursor(cursor);
 
-        final String imageUrl = MoviesDataRequester.getPosterUrl( movie.getPosterPath() );
+        final String posterPath = cursor.getString(cursor.getColumnIndex(MoviesContract.MovieEntry.COLUMN_POSTER_PATH));
+        final String imageUrl = MoviesDataRequester.getPosterUrl( posterPath );
         ImageLoader.getInstance().displayImage(imageUrl, viewHolder.mImageView);
     }
 
