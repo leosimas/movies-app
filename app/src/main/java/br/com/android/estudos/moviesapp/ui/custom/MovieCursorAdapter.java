@@ -38,7 +38,8 @@ public class MovieCursorAdapter extends CursorRecyclerViewAdapter<MovieCursorAda
         viewHolder.mImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.ACTION_VIEW_MOVIE);
+                Intent intent = new Intent(MainActivity.ACTION_VIEW_MOVIE)
+                        .putExtra(MainActivity.EXTRA_MOVIE, movie);
                 mContext.sendBroadcast(intent);
             }
         });

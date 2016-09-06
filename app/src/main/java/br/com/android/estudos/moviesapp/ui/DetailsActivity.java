@@ -3,6 +3,7 @@ package br.com.android.estudos.moviesapp.ui;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 
 import br.com.android.estudos.moviesapp.R;
 import br.com.android.estudos.moviesapp.model.Movie;
@@ -33,4 +34,12 @@ public class DetailsActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            this.finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }

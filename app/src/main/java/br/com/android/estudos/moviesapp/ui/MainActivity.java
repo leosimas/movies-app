@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity implements MoviesFragment.Ca
 
     private static final String TAG_DETAIL = "tag_detail";
 
-    private BroadcastReceiver viewMovieRecevier = new BroadcastReceiver() {
+    private BroadcastReceiver mViewMovieRecever = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
@@ -56,7 +56,8 @@ public class MainActivity extends AppCompatActivity implements MoviesFragment.Ca
 
         if ( mTwoPanes ) {
             this.getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, MovieDetailsFragment.newInstance( null ), TAG_DETAIL);
+                    .replace(R.id.fragment_container, MovieDetailsFragment.newInstance( null ), TAG_DETAIL)
+                .commit();
         }
 
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
@@ -65,24 +66,17 @@ public class MainActivity extends AppCompatActivity implements MoviesFragment.Ca
         ImageLoader.getInstance().init(config);
 
         IntentFilter filter = new IntentFilter(ACTION_VIEW_MOVIE);
-        this.registerReceiver(viewMovieRecevier, filter);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
+        this.registerReceiver(mViewMovieRecever, filter);
 
         MoviesContract.Sort newSort = PrefUtils.getSortMovies(this);
-        if ( mSort != newSort ) {
-            this.onSortChanged(newSort);
-        }
+        this.onSortChanged(newSort);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        this.unregisterReceiver(viewMovieRecevier);
+        this.unregisterReceiver(mViewMovieRecever);
     }
 
     @Override
